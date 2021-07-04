@@ -1,0 +1,87 @@
+﻿@{
+    ViewBag.Title = "Home Page";
+
+    var ddlregions = (List<CovidCases.Controllers.RegionsList>)ViewBag.GetRegions_result;
+}
+
+@section csss{
+    <!-- DataTables -->
+    <link rel="stylesheet" href="~/Content/plugins/jquery-datatable/dataTables.bootstrap4.min.css">
+}
+
+<section class="content-header">
+    <div class="container-fluid">
+        <div class="row mb-2">
+            <div class="col-sm-6">
+                <h1>COVID-19 CASES</h1>
+            </div>
+            <div class="col-sm-6">
+                <ol class="breadcrumb float-sm-right">
+                    <li class="breadcrumb-item"><a href="#">Home</a></li>
+                    <li class="breadcrumb-item active">Covid cases</li>
+                </ol>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="content">
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="card-title">TOP 10 COVID CASES </h3>
+                    @Html.DropDownList("ddlRegion", new SelectList(ddlregions as System.Collections.IEnumerable, "iso", "name"), "Regions", new { @class = "form-control select2", onchange = "GetDetail(this.options[this.selectedIndex].value, this.options[this.selectedIndex].text);" })
+                </div>
+                <div class="card-body" id="tableCovidList">                    
+
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+@section jss
+    {
+    <script src="~/Content/plugins/jquery-datatable/datatablescripts.bundle.js"></script>
+    <script src="~/Content/plugins/jquery-datatable/buttons/dataTables.buttons.min.js"></script>
+    <script src="~/Content/plugins/jquery-datatable/buttons/buttons.bootstrap4.min.js"></script>
+    <script src="~/Content/plugins/jquery-datatable/buttons/buttons.colVis.min.js"></script>
+    <script src="~/Content/plugins/jquery-datatable/buttons/buttons.html5.min.js"></script>
+    <script src="~/Content/plugins/jquery-datatable/buttons/buttons.print.min.js"></script>
+}
+
+@section scripts{
+    <script>
+        $(document).ready(function () {
+            GetRegDetail();
+        });
+
+        function GetDetail(iso, name) {
+            if (name == "Regions") {
+                GetRegDetail();
+            }
+            else {
+                $.ajax({
+                    type: "Get",
+                    url: '@Url.Action("DetailCases", "Home")',
+                    data: { 'iso': iso, 'name': name },
+                    success: function (response) {
+                        $('#tableCovidList').html(response);
+                    }
+                });
+            }
+        }
+
+        function GetRegDetail() {
+            $.ajax({
+                type: "Get",
+                url: '@Url.Action("RegionCases", "Home")',
+                success: function (response) {
+                   $('#tableCovidList').html(response);
+                }
+            })
+        }
+
+    </script>
+}

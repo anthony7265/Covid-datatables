@@ -1,0 +1,65 @@
+﻿@{
+    ViewBag.Title = "Contact";
+
+    var GetCasesResult = (List<CovidCases.Controllers.ProvinceCasesList>)ViewBag.GetCases_result;
+}
+
+<table id="example1" class="table table-bordered table-striped">
+    <thead>
+        <tr>
+            <th>REGION</th>
+            <th>CASES</th>
+            <th>DEATHS</th>
+        </tr>
+    </thead>
+    <tbody>
+        @for (var i = 0; i < GetCasesResult.Count(); i++)
+        {
+            int con = i + 1;
+            <tr>
+                <td>@GetCasesResult[i].provinceName</td>
+                <td>@GetCasesResult[i].cases</td>
+                <td>@GetCasesResult[i].deaths</td>
+            </tr>
+        }
+    </tbody>
+</table>
+<input id="txtxml" name="txtxml" type="text" value="@ViewBag.xml_result" hidden />
+<script>
+    $(function () {
+        $('#example1').DataTable({
+            //"order": [[1, "desc"]],
+            //"buttons": ["copy", "csv"],
+            //"paging": false
+            "ordering": false,
+            dom: 'Bfrtip',
+            buttons: [
+                {
+                    text: 'XML',
+                    action: function (e, dt, button, config) {
+                        var data = dt.buttons.exportData();
+                        var xml = $("#txtxml").val();
+                        $.fn.dataTable.fileSave(
+                            new Blob([xml]),
+                            'Export.xml'
+                        );
+                        console.log(data);
+                    }
+                },
+                {
+                    text: 'JSON',
+                    action: function (e, dt, button, config) {
+                        var data = dt.buttons.exportData();
+                        $.fn.dataTable.fileSave(
+                            new Blob([JSON.stringify(data)]),
+                            'Export.json'
+                        );
+                    }
+                }, "csv"
+            ]
+        }).buttons().container().appendTo('#example1_wrapper .col-md-6:eq(0)');
+
+        //document.getElementById('example1_paginate').style.display = 'none';
+        //document.getElementById('example1_info').style.display = 'none';
+    });
+</script>
